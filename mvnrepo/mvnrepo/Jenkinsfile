@@ -9,34 +9,21 @@ pipeline {
             }
         }
 
-        stage('Inspect Project') {
+        stage('Build Java WAR') {
             steps {
-                sh 'pwd'
-                sh 'ls -la mvnrepo/mvnrepo'
+                dir('mvnrepo/mvnrepo/backend') {
+                    sh '''
+                        docker run --rm \
+                          -v "$PWD":/app \
+                          -w /app \
+                          maven:3.9-eclipse-temurin-17 \
+                          mvn -B clean package
+
+                        ls -lh target/
+                    '''
+                }
             }
         }
-
-       
-stage('Build Java WAR') {
-    steps {
-        dir('mvnrepo/mvnrepo/backend') {
-            sh '''
-                echo "Checking Java and Maven"
-                java -version
-                mvn -version
-
-                echo "Checking compiler"
-                javac -version
-                which javac
-
-                echo "Building WAR"
-                mvn -B clean package
-                ls -lh target/
-            '''
-        }
-    }
-}
-
 
         stage('Build Docker Image') {
             steps {
@@ -50,7 +37,7 @@ stage('Build Java WAR') {
             echo 'Java WAR built and Docker image created successfully.'
         }
         failure {
-            echo 'Build failed. Check Console Output for the error.'
+            echo 'Build failed. Check Console Output.'
         }
     }
 }
