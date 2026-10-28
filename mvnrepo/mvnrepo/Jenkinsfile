@@ -28,6 +28,13 @@ pipeline {
             }
         }
     }
+    stage('Inspect Workspace') {
+    steps {
+        sh 'pwd'
+        sh 'ls -la'
+        sh 'find . -maxdepth 4 -name pom.xml'
+    }
+}
 
     post {
         success {
