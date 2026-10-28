@@ -2,6 +2,12 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_REGION = 'us-east-1'
+        ECR_REGISTRY = '756859458109.dkr.ecr.us-east-1.amazonaws.com'
+        ECR_REPOSITORY = 'mvnrepo/backend'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -27,17 +33,42 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t mvnrepo-backend:${BUILD_NUMBER} mvnrepo/mvnrepo/backend'
+                sh '''
+                    docker build \
+                      -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER} \
+                      mvnrepo/mvnrepo/backend
+                '''
+            }
+        }
+
+        stage('Login to ECR') {
+            steps {
+                sh '''
+                    aws ecr get-login-password \
+                      --region ${AWS_REGION} |
+                    docker login \
+                      --username AWS \
+                      --password-stdin ${ECR_REGISTRY}
+                '''
+            }
+        }
+
+        stage('Push Image to ECR') {
+            steps {
+                sh '''
+                    docker push \
+                      ${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Java WAR built and Docker image created successfully.'
+            echo 'SUCCESS: Java WAR built and Docker image pushed to ECR.'
         }
         failure {
-            echo 'Build failed. Check Console Output.'
+            echo 'FAILED: Check Console Output for the failing stage.'
         }
     }
 }
