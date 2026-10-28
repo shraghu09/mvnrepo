@@ -1,0 +1,9 @@
+target/
+*.war
+*.class
+.env
+*.pem
+secrets/
+.idea/
+.vscode/
+.DS_Store

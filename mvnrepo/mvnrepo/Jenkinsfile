@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    tools {
+        // Configure a JDK 17 and Maven installation in
+        // Jenkins > Manage Jenkins > Tools, or remove this block
+        // if your Jenkins agent already has them on PATH.
+        jdk 'JDK17'
+        maven 'Maven3'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build WAR') {
+            steps {
+                dir('backend') {
+                    sh 'mvn -B clean package'
+                }
+            }
+        }
+        stage('Build Backend Docker Image') {
+            steps {
+                sh 'docker build -t mvnrepo-backend:${BUILD_NUMBER} ./backend'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and Docker image creation completed.'
+        }
+        failure {
+            echo 'Pipeline failed. Review the stage logs.'
+        }
+    }
+}

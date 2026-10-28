@@ -1,0 +1,27 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  margin: 0;
+  padding: 40px 20px;
+}
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+button {
+  padding: 12px 20px;
+  background: #146eb4;
+  color: white;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+pre {
+  white-space: pre-wrap;
+  margin-top: 20px;
+}
