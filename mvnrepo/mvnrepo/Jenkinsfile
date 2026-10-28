@@ -16,16 +16,27 @@ pipeline {
             }
         }
 
-        stage('Build Java WAR') {
-            steps {
-               dir('mvnrepo/mvnrepo/backend') {
-    sh 'which java'
-    sh 'java -version'
-    sh 'mvn -version'
-    sh 'mvn -B clean package'
-}
-            }
+       
+stage('Build Java WAR') {
+    steps {
+        dir('mvnrepo/mvnrepo/backend') {
+            sh '''
+                echo "Checking Java and Maven"
+                java -version
+                mvn -version
+
+                echo "Checking compiler"
+                javac -version
+                which javac
+
+                echo "Building WAR"
+                mvn -B clean package
+                ls -lh target/
+            '''
         }
+    }
+}
+
 
         stage('Build Docker Image') {
             steps {
