@@ -3,16 +3,41 @@ pipeline {
     agent any
 
     stages {
-        stage('Inspect Workspace') {
+        stage('Checkout') {
             steps {
-                sh 'echo "Workspace:"'
-                sh 'pwd'
-                sh 'ls -la'
-                sh 'find . -maxdepth 6 -name pom.xml'
-                sh 'java -version'
-                sh 'mvn -version'
-                sh 'docker --version'
+                checkout scm
             }
+        }
+
+        stage('Inspect Project') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la mvnrepo/mvnrepo'
+            }
+        }
+
+        stage('Build Java WAR') {
+            steps {
+                dir('mvnrepo/mvnrepo/backend') {
+                    sh 'mvn -B clean package'
+                    sh 'ls -lh target/backend.war'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t mvnrepo-backend:${BUILD_NUMBER} mvnrepo/mvnrepo/backend'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Java WAR built and Docker image created successfully.'
+        }
+        failure {
+            echo 'Build failed. Check Console Output for the error.'
         }
     }
 }
