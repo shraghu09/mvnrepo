@@ -18,10 +18,12 @@ pipeline {
 
         stage('Build Java WAR') {
             steps {
-                dir('mvnrepo/mvnrepo/backend') {
-                    sh 'mvn -B clean package'
-                    sh 'ls -lh target/backend.war'
-                }
+               dir('mvnrepo/mvnrepo/backend') {
+    sh 'which java'
+    sh 'java -version'
+    sh 'mvn -version'
+    sh 'mvn -B clean package'
+}
             }
         }
 
